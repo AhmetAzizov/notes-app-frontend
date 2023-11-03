@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { fetchNotes } from './network/notes_api';
 // import Note from "./models/note";
-import { Row, Container, Button, Card, Col } from 'react-bootstrap';
+import { Row, Container, Col } from 'react-bootstrap';
 import Note from './Note';
 import { Note as NoteModel } from './models/note';
 
@@ -15,7 +15,6 @@ function App() {
     }
     getNotes();
   }, []);
-
 
 
   return (
