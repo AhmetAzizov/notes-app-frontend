@@ -1,25 +1,37 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { useEffect, useState } from 'react';
+import { fetchNotes } from './network/notes_api';
+// import Note from "./models/note";
+import { Row, Container, Button, Card, Col } from 'react-bootstrap';
+import Note from './Note';
+import { Note as NoteModel } from './models/note';
 
 function App() {
+  const [notes, setNotes] = useState<NoteModel[]>([]);
+
+  useEffect(() => {
+    const getNotes = async () => {
+      const notes = await fetchNotes();
+      setNotes(notes);
+    }
+    getNotes();
+  }, []);
+
+
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <Container>
+        <Row className='g-4' xs={1} sm={2} md={3} xl={4}>
+          {
+            notes.map((note, index) => (
+              <Col key={index} >
+                <Note note={note} />
+              </Col>
+            ))
+          }
+        </Row>
+      </Container>
+    </>
   );
 }
 
