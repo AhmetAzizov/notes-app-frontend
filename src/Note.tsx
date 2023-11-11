@@ -1,5 +1,4 @@
 import { Card } from 'react-bootstrap';
-// @ts-ignore
 import styles from "./styles/card.module.css";
 import { Note as NoteModel } from './models/note';
 import formatDate from './utils/formatDate';
