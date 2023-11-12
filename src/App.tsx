@@ -14,10 +14,14 @@ function App() {
     getNotes();
   }, []);
 
-
   async function getNotes() {
     const notes = await fetchNotes();
     setNotes(notes);
+  }
+
+  function onNoteSaved() {
+    setShowAddNoteDialog(false)
+    getNotes()
   }
 
   return (
@@ -42,10 +46,7 @@ function App() {
 
       {showAddNoteDialog && <AddNoteDialog
         onDismiss={() => setShowAddNoteDialog(false)}
-        onNoteSaved={() => {
-          setShowAddNoteDialog(false)
-          getNotes()
-        }}
+        onNoteSaved={() => onNoteSaved()}
       />}
     </>
   );

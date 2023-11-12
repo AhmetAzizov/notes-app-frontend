@@ -4,13 +4,12 @@ import { Note as NoteModel } from "./models/note";
 import { useForm } from "react-hook-form";
 import { NoteInput, createNote } from "./network/notes_api";
 
-interface addNoteDialog {
+interface addNoteDialogProps {
     onDismiss: () => void,
     onNoteSaved: () => void,
 }
 
-const AddNoteDialog = ({ onDismiss, onNoteSaved }: addNoteDialog) => {
-
+const AddNoteDialog = ({ onDismiss, onNoteSaved }: addNoteDialogProps) => {
     const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<NoteInput>();
 
     async function onSubmit(note: NoteInput) {

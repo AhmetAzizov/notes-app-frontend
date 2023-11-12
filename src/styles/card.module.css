@@ -25,3 +25,8 @@
   line-break: anywhere;
   white-space: pre-line;
 }
+
+.cardTitle {
+  display: flex;
+  justify-content: space-between;
+}
