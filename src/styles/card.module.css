@@ -30,3 +30,12 @@
   display: flex;
   justify-content: space-between;
 }
+
+.noteDelete {
+  color: red;
+  transition: transform 0.2s ease-in-out;
+}
+
+.noteDelete:hover {
+  transform: translateY(-2px);
+}
