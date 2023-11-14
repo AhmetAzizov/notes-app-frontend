@@ -1,15 +1,15 @@
 import { Button, Modal, Form } from "react-bootstrap";
-import utilsStyle from "./styles/utils.module.css";
-import { Note as NoteModel } from "./models/note";
+import utilsStyle from "../styles/utils.module.css";
 import { useForm } from "react-hook-form";
-import { NoteInput, createNote } from "./network/notes_api";
+import { NoteInput, createNote } from "../network/notes_api";
 
 interface addNoteDialogProps {
+    showDialog: boolean,
     onDismiss: () => void,
     onNoteSaved: () => void,
 }
 
-const AddNoteDialog = ({ onDismiss, onNoteSaved }: addNoteDialogProps) => {
+const AddNoteDialog = ({ showDialog, onDismiss, onNoteSaved }: addNoteDialogProps) => {
     const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<NoteInput>();
 
     async function onSubmit(note: NoteInput) {
@@ -23,7 +23,7 @@ const AddNoteDialog = ({ onDismiss, onNoteSaved }: addNoteDialogProps) => {
     }
 
     return (
-        <Modal show onHide={onDismiss}>
+        <Modal show={showDialog} onHide={onDismiss}>
             <Modal.Header closeButton>
                 <Modal.Title>Save Note</Modal.Title>
             </Modal.Header>

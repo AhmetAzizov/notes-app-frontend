@@ -1,16 +1,18 @@
 import { useEffect, useState } from 'react';
 import { fetchNotes } from './network/notes_api';
-import { Row, Container, Col, Button } from 'react-bootstrap';
-import Note from './Note';
+import { Row, Container, Col, Button, Modal } from 'react-bootstrap';
+import Note from './components/Note';
 import { Note as NoteModel } from './models/note';
 import utilsStyle from "./styles/utils.module.css";
 import styles from "./styles/app.module.css";
-import AddNoteDialog from './AddNoteDialog';
+import AddNoteDialog from './components/AddNoteDialog';
 import { AiOutlineFileAdd } from "react-icons/ai";
+import DeleteNoteDialog from './components/DeleteNoteDialog';
 
 function App() {
   const [notes, setNotes] = useState<NoteModel[]>([]);
   const [showAddNoteDialog, setShowAddNoteDialog] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   useEffect(() => {
     getNotes();
@@ -47,17 +49,23 @@ function App() {
               <Col key={index} >
                 <Note
                   note={note}
-                  onDelete={() => { getNotes() }} />
+                  onDelete={() => setShowDeleteDialog(true)} />
               </Col>
             ))
           }
         </Row>
       </Container>
 
-      {showAddNoteDialog && <AddNoteDialog
+      <AddNoteDialog
+        showDialog={showAddNoteDialog}
         onDismiss={() => setShowAddNoteDialog(false)}
         onNoteSaved={() => onNoteSaved()}
-      />}
+      />
+
+      <DeleteNoteDialog
+        showDialog={showDeleteDialog}
+        closeDialog={() => setShowDeleteDialog(false)}
+      />
     </>
   );
 }
