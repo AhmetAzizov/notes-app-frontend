@@ -7,7 +7,7 @@ import { deleteNote } from '../network/notes_api';
 
 interface NoteProps {
     note: NoteModel,
-    onDelete: () => void,
+    onDelete: (note: NoteModel) => void,
 }
 
 const Note = ({ note, onDelete }: NoteProps) => {
@@ -20,7 +20,7 @@ const Note = ({ note, onDelete }: NoteProps) => {
             await deleteNote(id);
             console.log("id of deleted card: " + id);
 
-            onDelete();
+            // onDelete();
         } catch (error) {
             console.error(error);
             alert(error)
@@ -36,7 +36,7 @@ const Note = ({ note, onDelete }: NoteProps) => {
                         <MdDelete
                             className={`text-muted ${styles.noteDelete}`}
                             // onClick={() => noteDelete(note._id)}
-                            onClick={() => onDelete()}
+                            onClick={() => onDelete(note)}
                         >
                         </MdDelete>
                     </Card.Title>

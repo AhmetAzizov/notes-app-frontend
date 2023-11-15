@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { fetchNotes } from './network/notes_api';
-import { Row, Container, Col, Button, Modal } from 'react-bootstrap';
+import { Row, Container, Col, Button } from 'react-bootstrap';
 import Note from './components/Note';
 import { Note as NoteModel } from './models/note';
 import utilsStyle from "./styles/utils.module.css";
@@ -13,6 +13,9 @@ function App() {
   const [notes, setNotes] = useState<NoteModel[]>([]);
   const [showAddNoteDialog, setShowAddNoteDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const deleteData = useRef<NoteModel | null>(null);
+
+
 
   useEffect(() => {
     getNotes();
@@ -49,7 +52,11 @@ function App() {
               <Col key={index} >
                 <Note
                   note={note}
-                  onDelete={() => setShowDeleteDialog(true)} />
+                  onDelete={(note) => {
+                    deleteData.current = note;
+                    setShowDeleteDialog(true)
+                  }
+                  } />
               </Col>
             ))
           }
@@ -62,10 +69,14 @@ function App() {
         onNoteSaved={() => onNoteSaved()}
       />
 
-      <DeleteNoteDialog
+      {deleteData.current && <DeleteNoteDialog
         showDialog={showDeleteDialog}
-        closeDialog={() => setShowDeleteDialog(false)}
-      />
+        onDismiss={() => {
+          setShowDeleteDialog(false)
+          deleteData.current = null;
+        }}
+        deleteNote={deleteData.current}
+      />}
     </>
   );
 }
