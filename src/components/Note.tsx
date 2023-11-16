@@ -3,7 +3,6 @@ import styles from "../styles/card.module.css";
 import { Note as NoteModel } from '../models/note';
 import formatDate from '../utils/formatDate';
 import { MdDelete } from "react-icons/md";
-import { deleteNote } from '../network/notes_api';
 
 interface NoteProps {
     note: NoteModel,
@@ -12,20 +11,7 @@ interface NoteProps {
 
 const Note = ({ note, onDelete }: NoteProps) => {
 
-
     const timeInfo = (note.updatedAt > note.createdAt) ? `Updated: ${formatDate(note.updatedAt)}` : `Created: ${formatDate(note.createdAt)}`;
-
-    async function noteDelete(id: string) {
-        try {
-            await deleteNote(id);
-            console.log("id of deleted card: " + id);
-
-            // onDelete();
-        } catch (error) {
-            console.error(error);
-            alert(error)
-        }
-    }
 
     return (
         <>

@@ -5,23 +5,24 @@ import styles from "../styles/deleteDialog.module.css";
 interface dialogProps {
     showDialog: boolean,
     onDismiss: () => void,
-    deleteNote: NoteModel,
+    deleteNoteData: NoteModel,
+    deleteNote: (id: string) => void,
 }
 
-const DeleteNoteDialog = ({ showDialog, onDismiss: closeDialog, deleteNote }: dialogProps) => {
+const DeleteNoteDialog = ({ showDialog, onDismiss, deleteNoteData, deleteNote }: dialogProps) => {
     return (
         <>
-            <Modal show={showDialog} onHide={closeDialog}>
+            <Modal show={showDialog} onHide={onDismiss}>
                 <Modal.Header >
                     <Modal.Title>You are about to delete this Note:</Modal.Title>
                 </Modal.Header>
-                <Modal.Body>{deleteNote.title}</Modal.Body>
-                <Modal.Body className={styles.dialogBody}>{deleteNote?.text}</Modal.Body>
+                <Modal.Body>{deleteNoteData.title}</Modal.Body>
+                <Modal.Body className={styles.dialogBody}>{deleteNoteData.text}</Modal.Body>
                 <Modal.Footer>
-                    <Button variant="primary" onClick={() => { }}>
+                    <Button variant="danger" onClick={() => deleteNote(deleteNoteData._id)}>
                         Delete
                     </Button>
-                    <Button variant="danger" onClick={closeDialog}>
+                    <Button variant="primary" onClick={onDismiss}>
                         Cancel
                     </Button>
                 </Modal.Footer>

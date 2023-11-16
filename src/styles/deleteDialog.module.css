@@ -1,9 +1,15 @@
 .dialogBody {
   max-height: 150px;
-  overflow: scroll;
+  line-break: anywhere;
+  scrollbar-width: none;
+  overflow-y: scroll;
   mask-image: linear-gradient(
     180deg,
     #000 60%,
     transparent
   ); /* To Add fading effect to bottom of card body if text overflows */
+}
+
+.dialogBody::-webkit-scrollbar {
+  display: none;
 }

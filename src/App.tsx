@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { fetchNotes } from './network/notes_api';
+import { deleteNote, fetchNotes } from './network/notes_api';
 import { Row, Container, Col, Button } from 'react-bootstrap';
 import Note from './components/Note';
 import { Note as NoteModel } from './models/note';
@@ -15,25 +15,37 @@ function App() {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const deleteData = useRef<NoteModel | null>(null);
 
-
-
   useEffect(() => {
-    getNotes();
+    updateNotes();
   }, []);
 
-  async function getNotes() {
-    const notes = await fetchNotes();
-    notes.sort((a, b) => {
+  async function updateNotes() {
+    const fetchedNotes = await fetchNotes();
+
+    fetchedNotes.sort((a, b) => {
       const date1 = new Date(a.updatedAt > a.createdAt ? a.updatedAt : a.createdAt).getTime();
       const date2 = new Date(b.updatedAt > b.createdAt ? b.updatedAt : b.createdAt).getTime();
       return date2 - date1;
     });
-    setNotes(notes);
+
+    setNotes(fetchedNotes);
   }
 
   function onNoteSaved() {
     setShowAddNoteDialog(false)
-    getNotes()
+    updateNotes()
+  }
+
+  async function noteDelete(id: string) {
+    try {
+      await deleteNote(id);
+      setShowDeleteDialog(false);
+      updateNotes();
+      console.log("Card with ID of " + id + " deleted succesfully!");
+    } catch (error) {
+      console.error(error);
+      alert(error)
+    }
   }
 
   return (
@@ -42,21 +54,19 @@ function App() {
         className={`${utilsStyle.centerItem} ${styles.addButton} my-4`}
         onClick={() => setShowAddNoteDialog(true)}
       >
-        <AiOutlineFileAdd />
-        Add new note
+        <AiOutlineFileAdd /> Add new note
       </Button>
       <Container className='pb-4'>
         <Row className='g-4' xs={1} sm={2} md={3} xl={4}>
           {
             notes.map((note, index) => (
-              <Col key={index} >
+              <Col key={index}>
                 <Note
                   note={note}
                   onDelete={(note) => {
                     deleteData.current = note;
-                    setShowDeleteDialog(true)
-                  }
-                  } />
+                    setShowDeleteDialog(true);
+                  }} />
               </Col>
             ))
           }
@@ -69,14 +79,17 @@ function App() {
         onNoteSaved={() => onNoteSaved()}
       />
 
-      {deleteData.current && <DeleteNoteDialog
-        showDialog={showDeleteDialog}
-        onDismiss={() => {
-          setShowDeleteDialog(false)
-          deleteData.current = null;
-        }}
-        deleteNote={deleteData.current}
-      />}
+      {deleteData.current &&
+        <DeleteNoteDialog
+          showDialog={showDeleteDialog}
+          onDismiss={() => {
+            setShowDeleteDialog(false)
+            deleteData.current = null;
+          }}
+          deleteNoteData={deleteData.current}
+          deleteNote={(id) => noteDelete(id)}
+        />
+      }
     </>
   );
 }
