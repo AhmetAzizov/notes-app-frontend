@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { deleteNote, fetchNotes } from './network/notes_api';
-import { Row, Container, Col, Button } from 'react-bootstrap';
+import { Row, Container, Col, Button, Spinner } from 'react-bootstrap';
 import Note from './components/Note';
 import { Note as NoteModel } from './models/note';
 import utilsStyle from "./styles/utils.module.css";
@@ -13,10 +13,21 @@ function App() {
   const [notes, setNotes] = useState<NoteModel[]>([]);
   const [showAddNoteDialog, setShowAddNoteDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [loadingState, setLoadingState] = useState(true);
   const deleteData = useRef<NoteModel | null>(null);
 
   useEffect(() => {
-    updateNotes();
+    // setTimeout(async () => {
+    //   await updateNotes();
+    //   console.log("set loading state");
+    //   setLoadingState(false);
+    // }, 1000)
+
+    const fnc = (async () => {
+      await updateNotes();
+      console.log("set loading state");
+      setLoadingState(false);
+    })()
   }, []);
 
   async function updateNotes() {
@@ -29,6 +40,7 @@ function App() {
     });
 
     setNotes(fetchedNotes);
+    console.log("got notes");
   }
 
   function onNoteSaved() {
@@ -50,45 +62,50 @@ function App() {
 
   return (
     <>
-      <Button
-        className={`${utilsStyle.centerItem} ${styles.addButton} my-4`}
-        onClick={() => setShowAddNoteDialog(true)}
-      >
-        <AiOutlineFileAdd /> Add new note
-      </Button>
-      <Container className='pb-4'>
-        <Row className='g-4' xs={1} sm={2} md={3} xl={4}>
-          {
-            notes.map((note, index) => (
-              <Col key={index}>
-                <Note
-                  note={note}
-                  onDelete={(note) => {
-                    deleteData.current = note;
-                    setShowDeleteDialog(true);
-                  }} />
-              </Col>
-            ))
+      <Spinner className={styles.spinner} hidden={!loadingState}></Spinner>
+      {!loadingState &&
+        <>
+          <Button
+            className={`${utilsStyle.centerItem} ${styles.addButton} my-4`}
+            onClick={() => setShowAddNoteDialog(true)}
+          >
+            <AiOutlineFileAdd /> Add new note
+          </Button>
+          <Container className='pb-4'>
+            <Row className='g-4' xs={1} sm={2} md={3} xl={4}>
+              {
+                notes.map((note, index) => (
+                  <Col key={index}>
+                    <Note
+                      note={note}
+                      onDelete={(note) => {
+                        deleteData.current = note;
+                        setShowDeleteDialog(true);
+                      }} />
+                  </Col>
+                ))
+              }
+            </Row>
+          </Container>
+
+          <AddNoteDialog
+            showDialog={showAddNoteDialog}
+            onDismiss={() => setShowAddNoteDialog(false)}
+            onNoteSaved={() => onNoteSaved()}
+          />
+
+          {deleteData.current &&
+            <DeleteNoteDialog
+              showDialog={showDeleteDialog}
+              onDismiss={() => {
+                setShowDeleteDialog(false)
+                deleteData.current = null;
+              }}
+              deleteNoteData={deleteData.current}
+              deleteNote={(id) => noteDelete(id)}
+            />
           }
-        </Row>
-      </Container>
-
-      <AddNoteDialog
-        showDialog={showAddNoteDialog}
-        onDismiss={() => setShowAddNoteDialog(false)}
-        onNoteSaved={() => onNoteSaved()}
-      />
-
-      {deleteData.current &&
-        <DeleteNoteDialog
-          showDialog={showDeleteDialog}
-          onDismiss={() => {
-            setShowDeleteDialog(false)
-            deleteData.current = null;
-          }}
-          deleteNoteData={deleteData.current}
-          deleteNote={(id) => noteDelete(id)}
-        />
+        </>
       }
     </>
   );
