@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { deleteNote, fetchNotes } from './network/notes_api';
 import { Row, Container, Col, Button, Spinner, Alert, Modal } from 'react-bootstrap';
 import Note from './components/Note';
@@ -8,17 +8,17 @@ import styles from "./styles/app.module.css";
 import AddNoteDialog from './components/AddNoteDialog';
 import { AiOutlineFileAdd } from "react-icons/ai";
 import DeleteNoteDialog from './components/DeleteNoteDialog';
-import deleteDialogData from './utils/deleteDialogData';
+import { DeleteDialogData } from './utils/deleteDialogData';
+import { AlertData, AlertType } from './utils/alertData';
 
 function App() {
   const [notes, setNotes] = useState<NoteModel[]>([]);
   const [showAddNoteDialog, setShowAddNoteDialog] = useState(false);
-  const [showDeletedAlert, setShowDeletedAlert] = useState(false);
+  const [alertData, setAlertData] = useState<AlertData>({ showDialog: false });
   const [loadingState, setLoadingState] = useState(true);
-  const [deleteNoteState, setDeleteNoteState] = useState<deleteDialogData>({ showDialog: false })
+  const [deleteNoteState, setDeleteNoteState] = useState<DeleteDialogData>({ showDialog: false })
 
   useEffect(() => {
-    // kasdkfsdkfsdfkasdf
     // setTimeout(async () => {
     //   await updateNotes();
     //   console.log("set loading state");
@@ -30,9 +30,6 @@ function App() {
       setLoadingState(false);
     })()
   }, []);
-
-  console.log("kaksdfsdf");
-
 
   async function updateNotes() {
     const fetchedNotes = await fetchNotes();
@@ -46,16 +43,22 @@ function App() {
     setNotes(fetchedNotes);
   }
 
+  function showAlert(data: string, alertType: AlertType) {
+    setAlertData({ showDialog: true, content: data, dialogAlertType: alertType })
+  }
+
   async function onNoteSaved() {
     await updateNotes()
+    showAlert("Note saved!", "secondary")
     setShowAddNoteDialog(false)
   }
 
   async function noteDelete(id: string) {
     try {
       await deleteNote(id);
+      await updateNotes();
       setDeleteNoteState({ showDialog: false });
-      updateNotes();
+      showAlert("Note deleted!", "danger");
       console.log("Card with ID of " + id + " deleted succesfully!");
     } catch (error) {
       console.error(error);
@@ -104,9 +107,9 @@ function App() {
             deleteNote={(id) => noteDelete(id)}
           />
 
-          <Modal show={showDeletedAlert} onHide={() => setShowDeletedAlert(false)}>
-            <Alert variant="warning" className='mb-0' dismissible onClose={() => setShowDeletedAlert(false)}>
-              The message has been deleted
+          <Modal show={alertData.showDialog} onHide={() => setAlertData({ showDialog: false })}>
+            <Alert variant={alertData.dialogAlertType} className='mb-0' dismissible onClose={() => setAlertData({ showDialog: false })}>
+              {alertData.content}
             </Alert>
           </Modal>
         </>

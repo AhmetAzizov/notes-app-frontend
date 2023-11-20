@@ -1,14 +1,17 @@
 import { Button, Modal } from "react-bootstrap";
 import styles from "../styles/deleteDialog.module.css";
-import deleteDialogData from "../utils/deleteDialogData";
+import { DeleteDialogData } from "../utils/deleteDialogData";
+import { useState } from "react";
 
 interface dialogProps {
-    deleteNoteState: deleteDialogData,
+    deleteNoteState: DeleteDialogData,
     onDismiss: () => void,
-    deleteNote: (id: string) => void,
+    deleteNote: (id: string) => Promise<void>,
 }
 
 const DeleteNoteDialog = ({ deleteNoteState, onDismiss, deleteNote }: dialogProps) => {
+    const [buttonDisabled, setButtonDisabled] = useState(false);
+
     return (
         <>
             <Modal show={deleteNoteState.showDialog} onHide={onDismiss}>
@@ -18,7 +21,14 @@ const DeleteNoteDialog = ({ deleteNoteState, onDismiss, deleteNote }: dialogProp
                 <Modal.Body>{deleteNoteState.deleteData?.title}</Modal.Body>
                 <Modal.Body className={styles.dialogBody}>{deleteNoteState.deleteData?.text}</Modal.Body>
                 <Modal.Footer>
-                    <Button variant="danger" onClick={() => deleteNote(deleteNoteState.deleteData!._id)}>
+                    <Button variant="danger" disabled={buttonDisabled} onClick={() => {
+                        (async () => {
+                            setButtonDisabled(true);
+                            await deleteNote(deleteNoteState.deleteData!._id)
+                            setButtonDisabled(false);
+                        })()
+                    }
+                    }>
                         Delete
                     </Button>
                     <Button variant="primary" onClick={onDismiss}>

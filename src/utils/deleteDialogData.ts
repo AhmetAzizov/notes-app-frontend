@@ -1,6 +1,6 @@
 import { Note } from "../models/note";
 
-export default interface deleteDialogData {
+export interface DeleteDialogData {
     showDialog: boolean,
     deleteData?: Note,
 }
