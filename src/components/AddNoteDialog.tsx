@@ -10,11 +10,12 @@ interface addNoteDialogProps {
 }
 
 const AddNoteDialog = ({ showDialog, onDismiss, onNoteSaved }: addNoteDialogProps) => {
-    const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<NoteInput>();
+    const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<NoteInput>();
 
     async function onSubmit(note: NoteInput) {
         try {
             await createNote(note);
+            reset(); // resets the fields
             onNoteSaved();
         } catch (error) {
             console.error(error);
@@ -56,6 +57,7 @@ const AddNoteDialog = ({ showDialog, onDismiss, onNoteSaved }: addNoteDialogProp
                     </Form.Group>
                 </Form>
             </Modal.Body>
+
             <Modal.Footer>
                 <Button
                     className={utilsStyle.centerItem}
