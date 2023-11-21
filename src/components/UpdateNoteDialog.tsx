@@ -2,21 +2,28 @@ import { Button, Modal, Form } from "react-bootstrap";
 import utilsStyle from "../styles/utils.module.css";
 import { useForm } from "react-hook-form";
 import { NoteInput, createNote } from "../network/notes_api";
+import { UpdateNoteData } from "../utils/updateNoteData";
 
-interface addNoteDialogProps {
-    showDialog: boolean,
+interface updateNoteDialogProps {
+    updateNoteState: UpdateNoteData,
     onDismiss: () => void,
-    onNoteSaved: () => void,
+    onNoteUpdated: () => void,
 }
 
-const AddNoteDialog = ({ showDialog, onDismiss, onNoteSaved }: addNoteDialogProps) => {
-    const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<NoteInput>();
+const UpdateNoteDialog = ({ updateNoteState, onDismiss, onNoteUpdated }: updateNoteDialogProps) => {
+
+    const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<NoteInput>({
+        defaultValues: {
+            title: updateNoteState.updateData?.title,
+            text: updateNoteState.updateData?.text,
+        }
+    });
 
     async function onSubmit(note: NoteInput) {
         try {
             reset(); // resets the fields
             await createNote(note);
-            onNoteSaved();
+            onNoteUpdated();
         } catch (error) {
             console.error(error);
             alert(error);
@@ -24,9 +31,12 @@ const AddNoteDialog = ({ showDialog, onDismiss, onNoteSaved }: addNoteDialogProp
     }
 
     return (
-        <Modal show={showDialog} onHide={onDismiss}>
+        <Modal show={updateNoteState.showDialog} onHide={() => {
+            onDismiss();
+            // reset();
+        }}>
             <Modal.Header closeButton>
-                <Modal.Title>Save Note</Modal.Title>
+                <Modal.Title>Update Note</Modal.Title>
             </Modal.Header>
 
             <Modal.Body>
@@ -73,4 +83,4 @@ const AddNoteDialog = ({ showDialog, onDismiss, onNoteSaved }: addNoteDialogProp
     );
 };
 
-export default AddNoteDialog;
+export default UpdateNoteDialog;

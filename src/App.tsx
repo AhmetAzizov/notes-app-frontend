@@ -10,21 +10,20 @@ import { AiOutlineFileAdd } from "react-icons/ai";
 import DeleteNoteDialog from './components/DeleteNoteDialog';
 import { DeleteDialogData } from './utils/deleteDialogData';
 import { AlertData, AlertType } from './utils/alertData';
+import UpdateNoteDialog from './components/UpdateNoteDialog';
+import { UpdateNoteData } from './utils/updateNoteData';
 
 function App() {
   const [notes, setNotes] = useState<NoteModel[]>([]);
   const [showAddNoteDialog, setShowAddNoteDialog] = useState(false);
+  const [updateNoteState, setUpdateNoteState] = useState<UpdateNoteData>({ showDialog: false });
   const [alertData, setAlertData] = useState<AlertData>({ showDialog: false });
-  const [loadingState, setLoadingState] = useState(true);
   const [deleteNoteState, setDeleteNoteState] = useState<DeleteDialogData>({ showDialog: false })
+  const [loadingState, setLoadingState] = useState(true);
+
+
 
   useEffect(() => {
-    // setTimeout(async () => {
-    //   await updateNotes();
-    //   console.log("set loading state");
-    //   setLoadingState(false);
-    // }, 1000);
-
     (async () => {
       await updateNotes();
       setLoadingState(false);
@@ -48,9 +47,9 @@ function App() {
   }
 
   async function onNoteSaved() {
+    setShowAddNoteDialog(false)
     await updateNotes()
     showAlert("Note saved!", "secondary")
-    setShowAddNoteDialog(false)
   }
 
   async function noteDelete(id: string) {
@@ -86,7 +85,11 @@ function App() {
                       note={note}
                       onDelete={(note) => {
                         setDeleteNoteState({ showDialog: true, deleteData: note });
-                      }} />
+                      }}
+                      onClick={(updateNote) => {
+                        setUpdateNoteState({ showDialog: true, updateData: updateNote })
+                      }}
+                    />
                   </Col>
                 ))
               }
@@ -98,6 +101,13 @@ function App() {
             onDismiss={() => setShowAddNoteDialog(false)}
             onNoteSaved={() => onNoteSaved()}
           />
+
+          {updateNoteState.updateData &&
+            <UpdateNoteDialog
+              updateNoteState={updateNoteState}
+              onDismiss={() => setUpdateNoteState({ showDialog: false })}
+              onNoteUpdated={() => onNoteSaved()}
+            />}
 
           <DeleteNoteDialog
             deleteNoteState={deleteNoteState}

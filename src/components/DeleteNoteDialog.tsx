@@ -21,7 +21,7 @@ const DeleteNoteDialog = ({ deleteNoteState, onDismiss, deleteNote }: dialogProp
                 <Modal.Body>{deleteNoteState.deleteData?.title}</Modal.Body>
                 <Modal.Body className={styles.dialogBody}>{deleteNoteState.deleteData?.text}</Modal.Body>
                 <Modal.Footer>
-                    <Button variant="danger" disabled={buttonDisabled} onClick={() => {
+                    <Button variant="danger" disabled={buttonDisabled} onClick={(e) => {
                         (async () => {
                             setButtonDisabled(true);
                             await deleteNote(deleteNoteState.deleteData!._id)
@@ -31,7 +31,7 @@ const DeleteNoteDialog = ({ deleteNoteState, onDismiss, deleteNote }: dialogProp
                     }>
                         Delete
                     </Button>
-                    <Button variant="primary" onClick={onDismiss}>
+                    <Button variant="primary" disabled={buttonDisabled} onClick={onDismiss}>
                         Cancel
                     </Button>
                 </Modal.Footer>

@@ -16,7 +16,6 @@ export async function fetchNotes(): Promise<NoteModel[]> {
     return response.json();
 }
 
-
 export interface NoteInput {
     title: string,
     text?: string,
