@@ -43,7 +43,11 @@ function App() {
   }
 
   function showAlert(data: string, alertType: AlertType) {
-    setAlertData({ showDialog: true, content: data, dialogAlertType: alertType })
+    setAlertData({ showDialog: true, content: data, dialogAlertType: alertType });
+
+    setTimeout(() => {
+      setAlertData({ showDialog: false });
+    }, 1000);
   }
 
   async function noteSaved() {
