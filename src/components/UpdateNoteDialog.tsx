@@ -1,13 +1,13 @@
 import { Button, Modal, Form } from "react-bootstrap";
 import utilsStyle from "../styles/utils.module.css";
 import { useForm } from "react-hook-form";
-import { NoteInput, createNote } from "../network/notes_api";
+import { NoteInput, updateNote } from "../network/notes_api";
 import { UpdateNoteData } from "../utils/updateNoteData";
 
 interface updateNoteDialogProps {
     updateNoteState: UpdateNoteData,
     onDismiss: () => void,
-    onNoteUpdated: () => void,
+    onNoteUpdated: () => Promise<void>,
 }
 
 const UpdateNoteDialog = ({ updateNoteState, onDismiss, onNoteUpdated }: updateNoteDialogProps) => {
@@ -21,9 +21,10 @@ const UpdateNoteDialog = ({ updateNoteState, onDismiss, onNoteUpdated }: updateN
 
     async function onSubmit(note: NoteInput) {
         try {
-            reset(); // resets the fields
-            await createNote(note);
-            onNoteUpdated();
+            if (!updateNoteState.updateData) throw Error("Update data is null!");
+            await updateNote(updateNoteState.updateData._id, note);
+            await onNoteUpdated();
+            reset();
         } catch (error) {
             console.error(error);
             alert(error);
@@ -31,10 +32,7 @@ const UpdateNoteDialog = ({ updateNoteState, onDismiss, onNoteUpdated }: updateN
     }
 
     return (
-        <Modal show={updateNoteState.showDialog} onHide={() => {
-            onDismiss();
-            // reset();
-        }}>
+        <Modal show={updateNoteState.showDialog} onHide={onDismiss}>
             <Modal.Header closeButton>
                 <Modal.Title>Update Note</Modal.Title>
             </Modal.Header>

@@ -25,12 +25,12 @@ function App() {
 
   useEffect(() => {
     (async () => {
-      await updateNotes();
+      await getNotes();
       setLoadingState(false);
     })()
   }, []);
 
-  async function updateNotes() {
+  async function getNotes() {
     const fetchedNotes = await fetchNotes();
 
     fetchedNotes.sort((a, b) => {
@@ -46,16 +46,32 @@ function App() {
     setAlertData({ showDialog: true, content: data, dialogAlertType: alertType })
   }
 
-  async function onNoteSaved() {
-    setShowAddNoteDialog(false)
-    await updateNotes()
-    showAlert("Note saved!", "secondary")
+  async function noteSaved() {
+    try {
+      setShowAddNoteDialog(false)
+      await getNotes();
+      showAlert("Note saved!", "success");
+    } catch (error) {
+      console.error(error);
+      alert(error);
+    }
   }
 
-  async function noteDelete(id: string) {
+  async function noteUpdated() {
+    try {
+      setUpdateNoteState({ showDialog: false });
+      await getNotes();
+      showAlert("Note Updated!", "info");
+    } catch (error) {
+      console.error(error);
+      alert(error);
+    }
+  }
+
+  async function noteDeleted(id: string) {
     try {
       await deleteNote(id);
-      await updateNotes();
+      await getNotes();
       setDeleteNoteState({ showDialog: false });
       showAlert("Note deleted!", "danger");
       console.log("Card with ID of " + id + " deleted succesfully!");
@@ -99,14 +115,14 @@ function App() {
           <AddNoteDialog
             showDialog={showAddNoteDialog}
             onDismiss={() => setShowAddNoteDialog(false)}
-            onNoteSaved={() => onNoteSaved()}
+            onNoteSaved={() => noteSaved()}
           />
 
           {updateNoteState.updateData &&
             <UpdateNoteDialog
               updateNoteState={updateNoteState}
               onDismiss={() => setUpdateNoteState({ showDialog: false })}
-              onNoteUpdated={() => onNoteSaved()}
+              onNoteUpdated={() => noteUpdated()}
             />}
 
           <DeleteNoteDialog
@@ -114,7 +130,7 @@ function App() {
             onDismiss={() => {
               setDeleteNoteState({ showDialog: false });
             }}
-            deleteNote={(id) => noteDelete(id)}
+            deleteNote={(id) => noteDeleted(id)}
           />
 
           <Modal show={alertData.showDialog} onHide={() => setAlertData({ showDialog: false })}>

@@ -6,7 +6,7 @@ import { NoteInput, createNote } from "../network/notes_api";
 interface addNoteDialogProps {
     showDialog: boolean,
     onDismiss: () => void,
-    onNoteSaved: () => void,
+    onNoteSaved: () => Promise<void>,
 }
 
 const AddNoteDialog = ({ showDialog, onDismiss, onNoteSaved }: addNoteDialogProps) => {
@@ -14,9 +14,9 @@ const AddNoteDialog = ({ showDialog, onDismiss, onNoteSaved }: addNoteDialogProp
 
     async function onSubmit(note: NoteInput) {
         try {
-            reset(); // resets the fields
             await createNote(note);
-            onNoteSaved();
+            await onNoteSaved();
+            reset();
         } catch (error) {
             console.error(error);
             alert(error);

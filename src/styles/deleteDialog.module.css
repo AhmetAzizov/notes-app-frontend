@@ -1,6 +1,7 @@
 .dialogBody {
   max-height: 150px;
   line-break: anywhere;
+  white-space: pre; /* This ensures the lines break properly */
   scrollbar-width: none;
   overflow-y: scroll;
   mask-image: linear-gradient(
