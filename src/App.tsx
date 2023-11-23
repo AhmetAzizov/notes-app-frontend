@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { deleteNote, fetchNotes } from './network/notes_api';
-import { Row, Container, Col, Button, Spinner, Alert, Modal } from 'react-bootstrap';
+import { Row, Container, Col, Button, Spinner, Alert, Modal, Navbar, Nav } from 'react-bootstrap';
 import Note from './components/Note';
 import { Note as NoteModel } from './models/note';
 import utilsStyle from "./styles/utils.module.css";
@@ -20,8 +20,6 @@ function App() {
   const [alertData, setAlertData] = useState<AlertData>({ showDialog: false });
   const [deleteNoteState, setDeleteNoteState] = useState<DeleteDialogData>({ showDialog: false })
   const [loadingState, setLoadingState] = useState(true);
-
-
 
   useEffect(() => {
     (async () => {
@@ -85,65 +83,86 @@ function App() {
     }
   }
 
+  const navigation = (
+    <Navbar expand="md" className={styles.navBar}>
+      <Container>
+        <Navbar.Brand href="#home" className={styles.navBrand}>Azizov's Note Application</Navbar.Brand>
+        <Navbar.Toggle />
+        <Navbar.Collapse>
+          <Nav style={{ marginLeft: "auto" }}>
+            <Nav.Link href="#home">Notes</Nav.Link>
+            <Nav.Link href="#link">Login</Nav.Link>
+          </Nav>
+        </Navbar.Collapse>
+      </Container>
+    </Navbar>
+  )
+
+  const notesGrid = (
+    <Container className='pb-4'>
+
+      <Button
+        className={`${utilsStyle.centerItem} ${styles.addButton} my-4`}
+        onClick={() => setShowAddNoteDialog(true)}
+      >
+        <AiOutlineFileAdd />
+        Add new note
+      </Button>
+
+      <Row className='g-4' xs={1} sm={2} md={3} xl={4}>
+        {
+          notes.map((note, index) => (
+            <Col key={index}>
+              <Note
+                note={note}
+                onDelete={(note) => {
+                  setDeleteNoteState({ showDialog: true, deleteData: note });
+                }}
+                onClick={(updateNote) => {
+                  setUpdateNoteState({ showDialog: true, updateData: updateNote })
+                }}
+              />
+            </Col>
+          ))
+        }
+      </Row>
+    </Container>
+  );
+
   return (
     <>
-      <Spinner className={styles.spinner} hidden={!loadingState}></Spinner>
-      {!loadingState &&
-        <>
-          <Button
-            className={`${utilsStyle.centerItem} ${styles.addButton} my-4`}
-            onClick={() => setShowAddNoteDialog(true)}
-          >
-            <AiOutlineFileAdd /> Add new note
-          </Button>
-          <Container className='pb-4'>
-            <Row className='g-4' xs={1} sm={2} md={3} xl={4}>
-              {
-                notes.map((note, index) => (
-                  <Col key={index}>
-                    <Note
-                      note={note}
-                      onDelete={(note) => {
-                        setDeleteNoteState({ showDialog: true, deleteData: note });
-                      }}
-                      onClick={(updateNote) => {
-                        setUpdateNoteState({ showDialog: true, updateData: updateNote })
-                      }}
-                    />
-                  </Col>
-                ))
-              }
-            </Row>
-          </Container>
+      {navigation}
 
-          <AddNoteDialog
-            showDialog={showAddNoteDialog}
-            onDismiss={() => setShowAddNoteDialog(false)}
-            onNoteSaved={() => noteSaved()}
-          />
+      <Spinner className={styles.loadingSpinner} hidden={!loadingState}></Spinner>
 
-          {updateNoteState.updateData &&
-            <UpdateNoteDialog
-              updateNoteState={updateNoteState}
-              onDismiss={() => setUpdateNoteState({ showDialog: false })}
-              onNoteUpdated={() => noteUpdated()}
-            />}
+      {!loadingState && notesGrid}
 
-          <DeleteNoteDialog
-            deleteNoteState={deleteNoteState}
-            onDismiss={() => {
-              setDeleteNoteState({ showDialog: false });
-            }}
-            deleteNote={(id) => noteDeleted(id)}
-          />
+      <Modal show={alertData.showDialog} onHide={() => setAlertData({ showDialog: false })}>
+        <Alert variant={alertData.dialogAlertType} className='mb-0' dismissible onClose={() => setAlertData({ showDialog: false })}>
+          {alertData.content}
+        </Alert>
+      </Modal>
 
-          <Modal show={alertData.showDialog} onHide={() => setAlertData({ showDialog: false })}>
-            <Alert variant={alertData.dialogAlertType} className='mb-0' dismissible onClose={() => setAlertData({ showDialog: false })}>
-              {alertData.content}
-            </Alert>
-          </Modal>
-        </>
-      }
+      <AddNoteDialog
+        showDialog={showAddNoteDialog}
+        onDismiss={() => setShowAddNoteDialog(false)}
+        onNoteSaved={() => noteSaved()}
+      />
+
+      {updateNoteState.updateData &&
+        <UpdateNoteDialog
+          updateNoteState={updateNoteState}
+          onDismiss={() => setUpdateNoteState({ showDialog: false })}
+          onNoteUpdated={() => noteUpdated()}
+        />}
+
+      <DeleteNoteDialog
+        deleteNoteState={deleteNoteState}
+        onDismiss={() => {
+          setDeleteNoteState({ showDialog: false });
+        }}
+        deleteNote={(id) => noteDeleted(id)}
+      />
     </>
   );
 }
